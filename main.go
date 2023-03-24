@@ -2,20 +2,10 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/libp2p/go-libp2p"
-	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/syndtr/goleveldb/leveldb"
 )
-
-type PeerInfo struct {
-	peerID (host.Host)
-	userID string
-
-	expiredTime time.Time
-	location    time.Location
-}
 
 func main() {
 	db, err := leveldb.OpenFile("db/userid", nil)
@@ -43,3 +33,13 @@ func main() {
 		return
 	}
 }
+
+/*
+type PeerInfo struct {
+	peerID (host.Host)
+	userID string
+
+	expiredTime time.Time
+	location    time.Location
+}
+*/
