@@ -1,13 +1,25 @@
 package main
 
 import (
-	"fmt"
-
-	"github.com/libp2p/go-libp2p"
-	"github.com/syndtr/goleveldb/leveldb"
+	"github.com/EtrusChain/synnefo/cmd"
 )
 
 func main() {
+	cmd.Execute()
+}
+
+/*
+type PeerInfo struct {
+	peerID (host.Host)
+	userID string
+
+	expiredTime time.Time
+	location    time.Location
+}
+*/
+
+/*
+
 	db, err := leveldb.OpenFile("db/userid", nil)
 	if err != nil {
 		return
@@ -32,14 +44,4 @@ func main() {
 	if err != nil {
 		return
 	}
-}
-
-/*
-type PeerInfo struct {
-	peerID (host.Host)
-	userID string
-
-	expiredTime time.Time
-	location    time.Location
-}
 */
