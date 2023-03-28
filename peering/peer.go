@@ -2,12 +2,11 @@ package peering
 
 import (
 	"bytes"
-	"crypto/sha256"
-	"encoding/gob"
+	"crypto/sha1"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 
-	"github.com/EtrusChain/synnefo/p2p"
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/core/protocol"
@@ -35,13 +34,12 @@ type PeerReciver struct {
 }
 
 func generatePublicKey(privatekey string) string {
-	h := sha256.New()
+	hasher := sha1.New()
+	hasher.Write([]byte(privatekey))
 
-	h.Write([]byte(privatekey))
+	sha := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 
-	bs := h.Sum(nil)
-
-	return string(bs)
+	return sha
 }
 
 func CreatePeer() *Peer {
@@ -67,21 +65,8 @@ func CreatePeer() *Peer {
 		panic(err)
 	}
 
-	userData := p2p.New(
-		node.ID(),
-		node,
-		node.Peerstore(),
-	)
 	// print the node's listening addresses
-	fmt.Println(userData)
-
 	pubKey := generatePublicKey(node.ID().Pretty())
-
-	var network bytes.Buffer        // Stand-in for a network connection
-	enc := gob.NewEncoder(&network) // Will write to network.
-	dec := gob.NewDecoder(&network) // Will read from network.
-	// Encode (send) the value.
-	fmt.Println(enc, dec)
 
 	protos := node.Mux().Protocols()
 
@@ -109,7 +94,7 @@ func CreatePeer() *Peer {
 		panic("")
 	}
 
-	fmt.Println("Your peer address is: %n", node.ID().Pretty())
+	fmt.Println("Your peer address is: \n", node.ID().Pretty())
 
 	return peerData
 }
@@ -152,11 +137,9 @@ func GetPeer() string {
 		return ""
 	}
 
-	fmt.Println("Peer: \n", string(b))
-	fmt.Println(string(userID))
-	fmt.Println(string(pubKey))
+	fmt.Println("Peer Data: \n", string(b))
 
-	return string(userID)
+	return string(b)
 }
 
 func RemovePeer() {
