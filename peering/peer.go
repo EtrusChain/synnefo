@@ -19,9 +19,19 @@ type Peer struct {
 	AgentVersion    string
 	ProtocolVersion string
 
-	identity  peer.ID
-	pubKey    string
-	addresses []string
+	Identity  peer.ID
+	PubKey    string
+	Addresses []string
+}
+
+type PeerReciver struct {
+	Protocols       string
+	AgentVersion    string
+	ProtocolVersion string
+
+	Identity  string
+	PubKey    string
+	Addresses []string
 }
 
 func generatePublicKey(privatekey string) string {
@@ -76,10 +86,10 @@ func CreatePeer() *Peer {
 	protos := node.Mux().Protocols()
 
 	peerData := &Peer{
-		identity: node.ID(),
-		pubKey:   pubKey,
+		Identity: node.ID(),
+		PubKey:   pubKey,
 
-		addresses:       nil,
+		Addresses:       nil,
 		Protocols:       protos,
 		AgentVersion:    "1.0.0",
 		ProtocolVersion: "1.0.0",
@@ -112,19 +122,41 @@ func GetPeer() string {
 
 	defer db.Close()
 
-	data, err := db.Get([]byte("userID"), nil)
+	userID, err := db.Get([]byte("userID"), nil)
 	if err != nil {
 		return ""
 	}
 
-	dataTwo, err := db.Get([]byte("peerID"), nil)
+	pubKey, err := db.Get([]byte("pubKey"), nil)
 	if err != nil {
 		return ""
 	}
 
-	fmt.Println("Peer: \n", string(dataTwo))
+	peerId, err := db.Get([]byte("peerID"), nil)
+	if err != nil {
+		return ""
+	}
 
-	return string(data)
+	peerData := &PeerReciver{
+		Identity: string(userID),
+		PubKey:   string(pubKey),
+
+		Addresses:       nil,
+		Protocols:       string(peerId),
+		AgentVersion:    "1.0.0",
+		ProtocolVersion: "1.0.0",
+	}
+
+	b, err := json.MarshalIndent(peerData, "", "   ")
+	if err != nil {
+		return ""
+	}
+
+	fmt.Println("Peer: \n", string(b))
+	fmt.Println(string(userID))
+	fmt.Println(string(pubKey))
+
+	return string(userID)
 }
 
 func RemovePeer() {
