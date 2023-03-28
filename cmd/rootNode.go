@@ -41,7 +41,7 @@ to quickly create a Cobra application.`,
 		fmt.Println(string(userID))
 
 		node, err := libp2p.New(
-			libp2p.ListenAddrStrings("/ip4/0.0.0.0/tcp/0"),
+			libp2p.ListenAddrStrings("/ip4/0.0.0.0/tcp/3423"),
 			libp2p.Ping(false),
 		)
 		if err != nil {
