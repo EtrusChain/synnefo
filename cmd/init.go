@@ -7,7 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/EtrusChain/synnefo/p2p"
+	"github.com/EtrusChain/synnefo/core"
 	"github.com/spf13/cobra"
 )
 
@@ -20,9 +20,11 @@ var initCmd = &cobra.Command{
 		fmt.Println("init called")
 
 		ctx := context.Background()
-		data := p2p.CreateLibp2pHost(ctx)
+		data, err := core.CreateLibp2pHost(ctx)
+		if err != nil {
+			panic(err)
+		}
 
-		fmt.Println("Hello world")
 		fmt.Println("user Data n:", data)
 	},
 }
