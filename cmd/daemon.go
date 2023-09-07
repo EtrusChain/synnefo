@@ -5,8 +5,10 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
+	"github.com/syndtr/goleveldb/leveldb"
 )
 
 // daemonCmd represents the daemon command
@@ -21,6 +23,12 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("daemon called")
+		db, err := leveldb.OpenFile("user/db", nil)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer db.Close()
 
 		select {}
 	},
