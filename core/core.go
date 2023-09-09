@@ -3,7 +3,6 @@ package core
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"time"
 
@@ -11,10 +10,9 @@ import (
 	"github.com/EtrusChain/synnefo/core/bootstrap"
 	"github.com/EtrusChain/synnefo/p2p"
 	"github.com/EtrusChain/synnefo/peering"
-	"github.com/ipfs/go-datastore"
+	"github.com/EtrusChain/synnefo/repo"
+	irouting "github.com/EtrusChain/synnefo/routing"
 	goprocess "github.com/jbenet/goprocess"
-	"github.com/libp2p/go-libp2p"
-	dht "github.com/libp2p/go-libp2p-kad-dht"
 	ddht "github.com/libp2p/go-libp2p-kad-dht/dual"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	psrouter "github.com/libp2p/go-libp2p-pubsub-router"
@@ -24,24 +22,19 @@ import (
 	"github.com/libp2p/go-libp2p/core/metrics"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
-	"github.com/libp2p/go-libp2p/core/peerstore"
 	"github.com/libp2p/go-libp2p/core/routing"
 	"github.com/libp2p/go-libp2p/p2p/discovery/mdns"
 	p2pbhost "github.com/libp2p/go-libp2p/p2p/host/basic"
-	"github.com/libp2p/go-libp2p/p2p/muxer/yamux"
 	madns "github.com/multiformats/go-multiaddr-dns"
-	"github.com/multiformats/go-multihash"
 	"github.com/syndtr/goleveldb/leveldb"
 )
-
-type ProvideManyRouter interface {
-	ProvideMany(ctx context.Context, keys []multihash.Multihash) error
-}
 
 // synnefoNode is IPFS Core module. It represents an IPFS instance.
 type SynnefoNode struct {
 	// Self
 	Identity peer.ID // the local node's identity
+
+	Repo repo.Repo
 
 	// Services
 	Reporter  *metrics.BandwidthCounter `optional:"true"`
@@ -52,12 +45,12 @@ type SynnefoNode struct {
 	PrivateKey ic.PrivKey `optional:"true"` // the local node's private Key
 
 	// Online
-	PeerHost        p2phost.Host            `optional:"true"` // the network host (server+client)
-	Peering         *peering.PeeringService `optional:"true"`
-	Bootstrapper    io.Closer               `optional:"true"` // the periodic bootstrapper
-	DNSResolver     *madns.Resolver         // the DNS resolver
-	ResourceManager network.ResourceManager `optional:"true"`
-	Routing         ProvideManyRouter       `optional:"true"` // the routing system. recommend ipfs-dht
+	PeerHost        p2phost.Host               `optional:"true"` // the network host (server+client)
+	Peering         *peering.PeeringService    `optional:"true"`
+	Bootstrapper    io.Closer                  `optional:"true"` // the periodic bootstrapper
+	DNSResolver     *madns.Resolver            // the DNS resolver
+	ResourceManager network.ResourceManager    `optional:"true"`
+	Routing         irouting.ProvideManyRouter `optional:"true"` // the routing system. recommend ipfs-dht
 
 	PubSub   *pubsub.PubSub             `optional:"true"`
 	PSRouter *psrouter.PubsubValueStore `optional:"true"`
@@ -88,69 +81,6 @@ func (n *SynnefoNode) Context() context.Context {
 		n.ctx = context.TODO()
 	}
 	return n.ctx
-}
-
-func CreateLibp2pHost(ctx context.Context) (string, error) {
-	db, err := leveldb.OpenFile("user/db", nil)
-	if err != nil {
-		return "", err
-	}
-
-	defer db.Close()
-
-	privKey, _, err := ic.GenerateKeyPair(ic.Ed25519, -1)
-	if err != nil {
-		fmt.Println("Error generating private key:", err)
-		return "", err
-	}
-	// Create a list of libp2p options, including the DHT option
-	opts := []libp2p.Option{
-		libp2p.DisableRelay(),     // Disable relay (optional)
-		libp2p.EnableNATService(), // Enable NAT service (optional)
-		libp2p.EnableNATService(), // Enable NAT port mapping (optional)
-		libp2p.DefaultTransports,  // Use default transports (optional)
-		libp2p.NATPortMap(),
-		libp2p.Muxer("/yamux/1.0.0", yamux.DefaultTransport),
-		libp2p.Identity(privKey),
-		libp2p.Ping(true),
-		libp2p.Routing(func(h p2phost.Host) (routing.PeerRouting, error) {
-			dht, err := dht.New(ctx, h)
-
-			return dht, err
-		}),
-		// libp2p.EnableAutoRelayWithPeerSource(),  // Enable auto relay (optional)
-		// libp2p.Security("synnefo", ctx),
-	}
-
-	fmt.Println(privKey)
-	// Create the libp2p host with the DHT option
-	host, err := libp2p.New(opts...)
-	if err != nil {
-		return "", err
-	}
-
-	// Attach the DHT to the host
-	dht, err := dht.New(ctx, host)
-	if err != nil {
-		return "", err
-	}
-
-	// Attach the DHT to the host as a routing option
-	host.Peerstore().AddAddrs(host.ID(), host.Addrs(), peerstore.PermanentAddrTTL)
-	err = dht.Bootstrap(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	privateKeyBytes, err := ic.MarshalPrivateKey(privKey)
-	if err != nil {
-		return "", err
-	}
-
-	db.Put([]byte("privKey"), privateKeyBytes, nil)
-	db.Put([]byte("pubKey"), []byte(host.ID().String()), nil)
-
-	return host.ID().String(), nil
 }
 
 func (n *SynnefoNode) Bootstrap(cfg bootstrap.BootstrapConfig) error {
@@ -200,14 +130,9 @@ func (n *SynnefoNode) Bootstrap(cfg bootstrap.BootstrapConfig) error {
 	return err
 }
 
-var TempBootstrapPeersKey = datastore.NewKey("/local/temp_bootstrap_peers")
+// var TempBootstrapPeersKey = datastore.NewKey("/local/temp_bootstrap_peers")
 
 func (n *SynnefoNode) loadBootstrapPeers() ([]peer.AddrInfo, error) {
-	data, err := n.Db.Get([]byte("BootstrapPeers"), nil)
-	if err != nil {
-		return nil, err
-	}
-
 	cfg, err := n.Repo.Config()
 	if err != nil {
 		return nil, err
@@ -218,20 +143,23 @@ func (n *SynnefoNode) loadBootstrapPeers() ([]peer.AddrInfo, error) {
 
 func (n *SynnefoNode) saveTempBootstrapPeers(ctx context.Context, peerList []peer.AddrInfo) error {
 	ds := n.Repo.Datastore()
+	ds.Close()
+
 	bytes, err := json.Marshal(config.BootstrapPeerStrings(peerList))
 	if err != nil {
 		return err
 	}
 
-	if err := ds.Put(ctx, TempBootstrapPeersKey, bytes); err != nil {
+	if err := ds.Put([]byte("TempBootstrapPeersKey"), bytes, nil); err != nil {
 		return err
 	}
-	return ds.Sync(ctx, TempBootstrapPeersKey)
+	return err
 }
 
 func (n *SynnefoNode) loadTempBootstrapPeers(ctx context.Context) ([]peer.AddrInfo, error) {
 	ds := n.Repo.Datastore()
-	bytes, err := ds.Get(ctx, TempBootstrapPeersKey)
+	ds.Close()
+	bytes, err := ds.Get([]byte("TempBootstrapPeersKey"), nil)
 	if err != nil {
 		return nil, err
 	}

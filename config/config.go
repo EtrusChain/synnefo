@@ -11,7 +11,7 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
-// Config is used to load ipfs config files.
+// Config is used to load synnefo config files.
 type Config struct {
 	Identity  Identity  // local node's peer identity
 	Datastore Datastore // local node's storage
@@ -20,6 +20,8 @@ type Config struct {
 	Bootstrap []string  // local nodes's bootstrap peer addresses
 
 	Peering Peering
+
+	Internal Internal // experimental/unstable options
 }
 
 const (
