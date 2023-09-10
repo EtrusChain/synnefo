@@ -4,11 +4,13 @@ Copyright © 2023 NAME HERE yusufmirza55@hotmail.com
 package cmd
 
 import (
-	"context"
-	"fmt"
+	"encoding/json"
+	"log"
+	"os"
 
-	"github.com/EtrusChain/synnefo/core/node"
+	"github.com/EtrusChain/synnefo/config"
 	"github.com/spf13/cobra"
+	"github.com/syndtr/goleveldb/leveldb"
 )
 
 // initCmd represents the init command
@@ -17,16 +19,34 @@ var initCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long:  `A longer description.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("init called")
+		var identity config.Identity
 
-		ctx := context.Background()
-		data, err := node.CreateLibp2pHost(ctx)
-
+		identity, err := config.CreateIdentity(os.Stdout, []config.KeyGenerateOption{
+			config.Key.Size(-1),
+			config.Key.Type("rsa"),
+		})
 		if err != nil {
 			panic(err)
 		}
 
-		fmt.Println("user Data n:", data)
+		conf, err := config.InitWithIdentity(identity)
+		if err != nil {
+			panic(err)
+		}
+
+		jsonData, err := json.MarshalIndent(conf, "", " ")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		db, err := leveldb.OpenFile("user/db", nil)
+		if err != nil {
+			panic(err)
+		}
+
+		defer db.Close()
+
+		db.Put([]byte("identity"), []byte(jsonData), nil)
 	},
 }
 

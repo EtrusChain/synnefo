@@ -26,10 +26,9 @@ import (
 	"github.com/libp2p/go-libp2p/p2p/discovery/mdns"
 	p2pbhost "github.com/libp2p/go-libp2p/p2p/host/basic"
 	madns "github.com/multiformats/go-multiaddr-dns"
-	"github.com/syndtr/goleveldb/leveldb"
 )
 
-// synnefoNode is IPFS Core module. It represents an IPFS instance.
+// synnefoNode is Synnefo Core module. It represents an Synnefo instance.
 type SynnefoNode struct {
 	// Self
 	Identity peer.ID // the local node's identity
@@ -57,7 +56,6 @@ type SynnefoNode struct {
 
 	DHT       *ddht.DHT       `optional:"true"`
 	DHTClient routing.Routing `name:"dhtc" optional:"true"`
-	Db        *leveldb.DB     `optional:"true"`
 
 	P2P *p2p.P2P `optional:"true"`
 
@@ -143,7 +141,7 @@ func (n *SynnefoNode) loadBootstrapPeers() ([]peer.AddrInfo, error) {
 
 func (n *SynnefoNode) saveTempBootstrapPeers(ctx context.Context, peerList []peer.AddrInfo) error {
 	ds := n.Repo.Datastore()
-	ds.Close()
+	defer ds.Close()
 
 	bytes, err := json.Marshal(config.BootstrapPeerStrings(peerList))
 	if err != nil {
@@ -158,7 +156,8 @@ func (n *SynnefoNode) saveTempBootstrapPeers(ctx context.Context, peerList []pee
 
 func (n *SynnefoNode) loadTempBootstrapPeers(ctx context.Context) ([]peer.AddrInfo, error) {
 	ds := n.Repo.Datastore()
-	ds.Close()
+	defer ds.Close()
+
 	bytes, err := ds.Get([]byte("TempBootstrapPeersKey"), nil)
 	if err != nil {
 		return nil, err

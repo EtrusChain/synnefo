@@ -20,6 +20,7 @@ type Config struct {
 	Bootstrap []string  // local nodes's bootstrap peer addresses
 
 	Peering Peering
+	DNS     DNS
 
 	Internal Internal // experimental/unstable options
 }
