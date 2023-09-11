@@ -6,8 +6,8 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/EtrusChain/synnefo/repo"
 	"github.com/spf13/cobra"
-	"github.com/syndtr/goleveldb/leveldb"
 )
 
 // identityCmd represents the identity command
@@ -21,15 +21,15 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		db, err := leveldb.OpenFile("user/db", nil)
+		db, err := repo.NewDatabaseHandler(repo.GetOs())
 		if err != nil {
 			panic(err)
 		}
 
 		defer db.Close()
-		data, err := db.Get([]byte("identity"), nil)
+		data, err := db.GetValue("identity")
 		if err != nil {
-			return
+			panic(err)
 		}
 
 		fmt.Println(string(data))

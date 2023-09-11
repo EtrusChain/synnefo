@@ -1,6 +1,8 @@
 package repo
 
 import (
+	"runtime"
+
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -33,6 +35,11 @@ func (dh *DatabaseHandler) SetValue(key string, value []byte) error {
 	return dh.db.Put([]byte(key), value, nil)
 }
 
+// SetValue stores a key-value pair in the database.
+func (dh *DatabaseHandler) CheckValue(key string) (bool, error) {
+	return dh.db.Has([]byte(key), nil)
+}
+
 // openDatabaseFile opens the LevelDB database file.
 func dataStore(dbPath string) (*leveldb.DB, error) {
 	db, err := leveldb.OpenFile(dbPath, nil)
@@ -40,4 +47,15 @@ func dataStore(dbPath string) (*leveldb.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func GetOs() string {
+	osName := runtime.GOOS
+	if osName == "windows" {
+		return "C:\\ProgramData\\EtrusChain"
+	} else if osName == "linux" {
+		return "~/.config/EtrusChain"
+	} else {
+		return "C:\\ProgramData\\EtrusChain"
+	}
 }

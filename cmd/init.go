@@ -5,12 +5,13 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/EtrusChain/synnefo/config"
+	"github.com/EtrusChain/synnefo/repo"
 	"github.com/spf13/cobra"
-	"github.com/syndtr/goleveldb/leveldb"
 )
 
 // initCmd represents the init command
@@ -19,9 +20,25 @@ var initCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long:  `A longer description.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		db, err := repo.NewDatabaseHandler(repo.GetOs())
+		if err != nil {
+			panic(err)
+		}
+
+		defer db.Close()
+
+		data, err := db.CheckValue("identity")
+		if err != nil {
+			panic(err)
+		}
+		if data {
+			fmt.Println("Peer identity already exists.")
+			return
+		}
+
 		var identity config.Identity
 
-		identity, err := config.CreateIdentity(os.Stdout, []config.KeyGenerateOption{
+		identity, err = config.CreateIdentity(os.Stdout, []config.KeyGenerateOption{
 			config.Key.Size(-1),
 			config.Key.Type("rsa"),
 		})
@@ -39,14 +56,7 @@ var initCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		db, err := leveldb.OpenFile("user/db", nil)
-		if err != nil {
-			panic(err)
-		}
-
-		defer db.Close()
-
-		db.Put([]byte("identity"), []byte(jsonData), nil)
+		db.SetValue("identity", []byte(jsonData))
 	},
 }
 
