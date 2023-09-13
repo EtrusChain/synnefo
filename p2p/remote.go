@@ -10,7 +10,7 @@ import (
 	manet "github.com/multiformats/go-multiaddr/net"
 )
 
-var maPrefix = "/" + ma.ProtocolWithCode(ma.P_IPFS).Name + "/"
+var maPrefix = "/" + ma.ProtocolWithCode(ma.P_P2P).Name + "/"
 
 // remoteListener accepts libp2p streams and proxies them to a manet host.
 type remoteListener struct {

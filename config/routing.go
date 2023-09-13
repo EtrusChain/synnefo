@@ -124,11 +124,9 @@ const (
 	MethodNameProvide       MethodName = "provide"
 	MethodNameFindProviders MethodName = "find-providers"
 	MethodNameFindPeers     MethodName = "find-peers"
-	MethodNameGetIPNS       MethodName = "get-ipns"
-	MethodNamePutIPNS       MethodName = "put-ipns"
 )
 
-var MethodNameList = []MethodName{MethodNameProvide, MethodNameFindPeers, MethodNameFindProviders, MethodNameGetIPNS, MethodNamePutIPNS}
+var MethodNameList = []MethodName{MethodNameProvide, MethodNameFindPeers, MethodNameFindProviders}
 
 type HTTPRouterParams struct {
 	// Endpoint is the URL where the routing implementation will point to get the information.

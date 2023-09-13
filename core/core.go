@@ -49,7 +49,7 @@ type SynnefoNode struct {
 	Bootstrapper    io.Closer                  `optional:"true"` // the periodic bootstrapper
 	DNSResolver     *madns.Resolver            // the DNS resolver
 	ResourceManager network.ResourceManager    `optional:"true"`
-	Routing         irouting.ProvideManyRouter `optional:"true"` // the routing system. recommend ipfs-dht
+	Routing         irouting.ProvideManyRouter `optional:"true"` // the routing system. recommend synnefo-dht
 
 	PubSub   *pubsub.PubSub             `optional:"true"`
 	PSRouter *psrouter.PubsubValueStore `optional:"true"`
@@ -82,7 +82,7 @@ func (n *SynnefoNode) Context() context.Context {
 }
 
 func (n *SynnefoNode) Bootstrap(cfg bootstrap.BootstrapConfig) error {
-
+	var err error
 	if n.Bootstrapper != nil {
 		n.Bootstrapper.Close() // stop previous bootstrap process.
 	}
@@ -128,8 +128,6 @@ func (n *SynnefoNode) Bootstrap(cfg bootstrap.BootstrapConfig) error {
 	return err
 }
 
-// var TempBootstrapPeersKey = datastore.NewKey("/local/temp_bootstrap_peers")
-
 func (n *SynnefoNode) loadBootstrapPeers() ([]peer.AddrInfo, error) {
 	cfg, err := n.Repo.Config()
 	if err != nil {
@@ -140,25 +138,33 @@ func (n *SynnefoNode) loadBootstrapPeers() ([]peer.AddrInfo, error) {
 }
 
 func (n *SynnefoNode) saveTempBootstrapPeers(ctx context.Context, peerList []peer.AddrInfo) error {
-	ds := n.Repo.Datastore()
-	defer ds.Close()
+	db, err := repo.NewDatabaseHandler(repo.GetOs())
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
 
 	bytes, err := json.Marshal(config.BootstrapPeerStrings(peerList))
 	if err != nil {
 		return err
 	}
 
-	if err := ds.Put([]byte("TempBootstrapPeersKey"), bytes, nil); err != nil {
+	if err := db.SetValue("TempBootstrapPeersKey", bytes); err != nil {
 		return err
 	}
 	return err
 }
 
 func (n *SynnefoNode) loadTempBootstrapPeers(ctx context.Context) ([]peer.AddrInfo, error) {
-	ds := n.Repo.Datastore()
-	defer ds.Close()
+	db, err := repo.NewDatabaseHandler(repo.GetOs())
+	if err != nil {
+		panic(err)
+	}
 
-	bytes, err := ds.Get([]byte("TempBootstrapPeersKey"), nil)
+	db.Close()
+
+	bytes, err := db.GetValue("TempBootstrapPeersKey")
 	if err != nil {
 		return nil, err
 	}

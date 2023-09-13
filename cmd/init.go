@@ -57,6 +57,15 @@ var initCmd = &cobra.Command{
 		}
 
 		db.SetValue("identity", []byte(jsonData))
+		db.SetValue("peerID", []byte(conf.Identity.PeerID))
+		db.SetValue("privKey", []byte(conf.Identity.PrivKey))
+
+		sd := &config.Identity{
+			PeerID:  conf.Identity.PeerID,
+			PrivKey: conf.Identity.PrivKey,
+		}
+
+		sd.DecodePrivateKey(sd.PrivKey)
 	},
 }
 
