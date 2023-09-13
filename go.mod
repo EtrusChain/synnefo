@@ -4,11 +4,21 @@ go 1.20
 
 require (
 	github.com/libp2p/go-libp2p v0.30.0
-	github.com/libp2p/go-libp2p-kad-dht v0.21.1
+	github.com/libp2p/go-libp2p-kad-dht v0.23.0
 	github.com/multiformats/go-multiaddr v0.11.0
 	github.com/multiformats/go-multiaddr-dns v0.3.1
 	github.com/spf13/cobra v1.7.0
 	go.uber.org/fx v1.20.0
+)
+
+require (
+	github.com/go-logr/logr v1.2.4 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/ipfs/boxo v0.8.0 // indirect
+	github.com/libp2p/go-libp2p-daemon v0.5.0 // indirect
+	go.opentelemetry.io/otel v1.14.0 // indirect
+	go.opentelemetry.io/otel/trace v1.14.0 // indirect
+	gonum.org/v1/gonum v0.11.0 // indirect
 )
 
 require (
@@ -43,7 +53,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/ipfs/go-cid v0.4.1 // indirect
 	github.com/ipfs/go-datastore v0.6.0 // indirect
-	github.com/ipfs/go-ipfs-ds-help v0.1.1 // indirect
+	github.com/ipfs/go-ipfs-ds-help v1.1.0 // indirect
 	github.com/ipfs/go-ipfs-util v0.0.2 // indirect
 	github.com/ipfs/go-ipns v0.3.0 // indirect
 	github.com/ipfs/go-log v1.0.5 // indirect
@@ -104,7 +114,7 @@ require (
 	github.com/raulk/go-watchdog v1.3.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/syndtr/goleveldb v1.0.0 // indirect
+	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7 // indirect
 	github.com/whyrusleeping/go-keyspace v0.0.0-20160322163242-5b898ac5add1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/dig v1.17.0 // indirect

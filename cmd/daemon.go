@@ -147,7 +147,12 @@ to quickly create a Cobra application.`,
 		defer peering.NewPeeringService(node)
 		defer nodePeering.Start()
 		defer nodePeering.Stop()
+		bootstrapPeerss, err := sd.BootstrapPeers()
+		if err != nil {
+			return
+		}
 
+		node.Connect(ctx, bootstrapPeerss[0])
 		listPeers := nodePeering.ListPeers()
 
 		fmt.Println(listPeers)
