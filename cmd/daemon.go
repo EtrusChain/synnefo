@@ -39,6 +39,7 @@ to quickly create a Cobra application.`,
 		p2pHost := p2p.New(node.ID(), node, node.Peerstore())
 
 		nodePeering := peering.NewPeeringService(node)
+
 		a := []string{
 			"/ip4/178.233.168.239/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",         // mars.i.ipfs.io
 			"/ip4/178.233.168.239/udp/4001/quic-v1/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm", // mars.i.ipfs.io
@@ -120,7 +121,6 @@ to quickly create a Cobra application.`,
 		fmt.Println(bootstrapPeers)
 		fmt.Println(bootsrapConfig)
 		peering.NewPeeringService(node)
-		nodePeering.Start()
 
 		/*
 			listeners := &p2p.Listeners{
@@ -140,7 +140,12 @@ to quickly create a Cobra application.`,
 		fmt.Println(sfdsf)
 
 		nodePeering.AddPeer(node.Peerstore().PeerInfo(node.ID()))
+
+		nodePeering.Start()
+		nodePeering.Stop()
+
 		listPeers := nodePeering.ListPeers()
+
 		fmt.Println(listPeers)
 		select {}
 	},

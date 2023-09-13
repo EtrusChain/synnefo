@@ -3,6 +3,7 @@ package peering
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math/rand"
 	"strconv"
 	"sync"
@@ -13,7 +14,6 @@ import (
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/multiformats/go-multiaddr"
 )
-
 
 const (
 	// maxBackoff is the maximum time between reconnect attempts.
@@ -54,7 +54,6 @@ type peerHandler struct {
 	host   host.Host
 	ctx    context.Context
 	cancel context.CancelFunc
-
 
 	mu             sync.Mutex
 	addrs          []multiaddr.Multiaddr
@@ -177,13 +176,16 @@ func (ps *PeeringService) Start() error {
 
 	switch ps.state {
 	case StateInit:
+		fmt.Println("Server Running Init")
 	case StateRunning:
+		fmt.Println("Server Running State")
 		return nil
 	case StateStopped:
 		return errors.New("already stopped")
 	}
 	ps.host.Network().Notify((*netNotifee)(ps))
 	ps.state = StateRunning
+	fmt.Println("Server Running")
 	for _, handler := range ps.peers {
 		go handler.startIfDisconnected()
 	}
