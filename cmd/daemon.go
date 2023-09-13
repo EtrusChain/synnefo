@@ -184,7 +184,7 @@ to quickly create a Cobra application.`,
 
 		if bootstrapPeerss[0].ID != node.ID() {
 
-			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/p2p/_testing")
+			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/synnefo/1.0.0")
 			if err != nil {
 				panic(err)
 			}
