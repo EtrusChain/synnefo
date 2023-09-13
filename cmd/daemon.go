@@ -7,6 +7,9 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/EtrusChain/synnefo/config"
@@ -16,6 +19,7 @@ import (
 	"github.com/EtrusChain/synnefo/p2p"
 	"github.com/EtrusChain/synnefo/peering"
 	"github.com/EtrusChain/synnefo/repo"
+	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/protocol"
 	"github.com/spf13/cobra"
@@ -173,6 +177,16 @@ to quickly create a Cobra application.`,
 			}
 		*/
 
+		host.Host.SetStreamHandler(node, "/synnefo/1.0.0", func(s network.Stream) {
+			go writeCounter(s)
+			go readCounter(s)
+		})
+
+		ada := n.Discovery.Start()
+		fmt.Println(ada)
+
+		n.Discovery.Close()
+
 		if bootstrapPeerss[0].ID != node.ID() {
 
 			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/p2p/_testing")
@@ -182,6 +196,10 @@ to quickly create a Cobra application.`,
 			go writeCounter(s)
 			go readCounter(s)
 		}
+
+		sigCh := make(chan os.Signal)
+		signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGINT)
+		<-sigCh
 
 		select {}
 	},
