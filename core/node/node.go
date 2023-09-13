@@ -41,6 +41,7 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 	// Create a list of libp2p options, including the DHT option
 	opts := []libp2p.Option{
 		//libp2p.DisableRelay(),     // Disable relay (optional)
+		libp2p.ListenAddrStrings("/ip4/127.0.0.1/tcp/0"),
 		libp2p.EnableNATService(), // Enable NAT service (optional)
 		libp2p.EnableNATService(), // Enable NAT port mapping (optional)
 		libp2p.DefaultTransports,  // Use default transports (optional)
