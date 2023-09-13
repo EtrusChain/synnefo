@@ -19,7 +19,6 @@ import (
 	"github.com/EtrusChain/synnefo/repo"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/network"
-	"github.com/libp2p/go-libp2p/core/protocol"
 	"github.com/spf13/cobra"
 )
 
@@ -141,45 +140,53 @@ to quickly create a Cobra application.`,
 			errorr := name.Error()
 			fmt.Println(errorr)
 		*/
-		check := p2pHost.CheckProtoExists("/x/")
-		fmt.Println(check)
 
-		nodeRegister := p2pHost.ListenersP2P
-		defer nodeRegister.Register(p2pHost.ListenersLocal.Listeners[protocol.ID("/synnefo/1.0.0")])
+		/*
+				mDNS := mdns.NewMdnsService(node, ServiceName, mdnsService)
 
-		fmt.Println(nodeRegister)
+				if err != nil {
+					log.Fatal(err)
+				}
 
-		nodePeering.AddPeer(node.Peerstore().PeerInfo(node.ID()))
-		defer peering.NewPeeringService(node)
-		defer nodePeering.Start()
-		defer nodePeering.Stop()
+				// Start the mDNS discovery service
+				if err := mDNS.Start(); err != nil {
+					log.Fatal(err)
+				}
+			check := p2pHost.CheckProtoExists("/x/")
+			fmt.Println(check)
+
+			nodeRegister := p2pHost.ListenersP2P
+			defer nodeRegister.Register(p2pHost.ListenersLocal.Listeners[protocol.ID("/synnefo/1.0.0")])
+
+			fmt.Println(nodeRegister)
+
+			nodePeering.AddPeer(node.Peerstore().PeerInfo(node.ID()))
+			defer peering.NewPeeringService(node)
+			defer nodePeering.Start()
+			defer nodePeering.Stop()
+
+			defer node.Connect(ctx, bootstrapPeerss[0])
+			listPeers := nodePeering.ListPeers()
+
+			fmt.Println(listPeers)
+		*/
+
 		bootstrapPeerss, err := sd.BootstrapPeers()
 		if err != nil {
 			return
 		}
 
-		defer node.Connect(ctx, bootstrapPeerss[0])
-		listPeers := nodePeering.ListPeers()
-
-		fmt.Println(listPeers)
-
-		/*
-			mDNS := mdns.NewMdnsService(node, ServiceName, mdnsService)
-
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			// Start the mDNS discovery service
-			if err := mDNS.Start(); err != nil {
-				log.Fatal(err)
-			}
-		*/
-
 		host.Host.SetStreamHandler(node, "/synnefo/1.0.0", func(s network.Stream) {
-			go writeCounter(s)
-			go readCounter(s)
+			err := readCounter(s)
+			if err != nil {
+				s.Reset()
+			} else {
+				s.Close()
+			}
 		})
+
+		hostInfor := host.InfoFromHost(node)
+		fmt.Println(hostInfor)
 
 		if bootstrapPeerss[0].ID != node.ID() {
 
@@ -209,7 +216,7 @@ func init() {
 	// daemonCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func writeCounter(s network.Stream) {
+func writeCounter(s network.Stream) error {
 	var counter uint64
 
 	for {
@@ -221,17 +228,22 @@ func writeCounter(s network.Stream) {
 			panic(err)
 		}
 	}
+
+	return nil
 }
 
-func readCounter(s network.Stream) {
+func readCounter(s network.Stream) error {
 	for {
 		var counter uint64
 
 		err := binary.Read(s, binary.BigEndian, &counter)
 		if err != nil {
 			panic(err)
+			return err
 		}
 
 		fmt.Printf("Received %d from %s\n", counter, s.ID())
 	}
+
+	return nil
 }
