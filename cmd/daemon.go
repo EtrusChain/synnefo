@@ -140,6 +140,8 @@ to quickly create a Cobra application.`,
 		fmt.Println(sfdsf)
 
 		nodePeering.AddPeer(node.Peerstore().PeerInfo(node.ID()))
+		listPeers := nodePeering.ListPeers()
+		fmt.Println(listPeers)
 		select {}
 	},
 }
