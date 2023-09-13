@@ -14,8 +14,6 @@ import (
 	"github.com/EtrusChain/synnefo/p2p"
 	"github.com/EtrusChain/synnefo/peering"
 	"github.com/EtrusChain/synnefo/repo"
-	peerstore "github.com/libp2p/go-libp2p/core/peer"
-	"github.com/libp2p/go-libp2p/core/protocol"
 	"github.com/spf13/cobra"
 )
 
@@ -37,17 +35,8 @@ to quickly create a Cobra application.`,
 			panic(err)
 		}
 
-		peerInfo := peerstore.AddrInfo{
-			ID:    node.ID(),
-			Addrs: node.Addrs(),
-		}
-		addrs, err := peerstore.AddrInfoToP2pAddrs(&peerInfo)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(addrs[0])
-
 		p2pHost := p2p.New(node.ID(), node, node.Peerstore())
+
 		nodePeering := peering.NewPeeringService(node)
 		a := []string{
 			"/ip4/178.233.168.239/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",         // mars.i.ipfs.io
@@ -132,11 +121,18 @@ to quickly create a Cobra application.`,
 		peering.NewPeeringService(node)
 		nodePeering.Start()
 
-		listeners := &p2p.Listeners{
-			Listeners: map[protocol.ID]p2p.Listener{},
-		}
+		/*
+			listeners := &p2p.Listeners{
+				Listeners: map[protocol.ID]p2p.Listener{},
+			}
 
-		listeners.Register()
+			name := listeners.Register(listeners.Listeners["/x/"])
+			errorr := name.Error()
+			fmt.Println(errorr)
+		*/
+
+		sfdsf := p2pHost.ListenersP2P
+		fmt.Println(sfdsf)
 		select {}
 	},
 }
