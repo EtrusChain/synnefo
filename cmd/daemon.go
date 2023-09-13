@@ -182,8 +182,6 @@ to quickly create a Cobra application.`,
 			go readCounter(s)
 		})
 
-		n.Discovery.Close()
-
 		if bootstrapPeerss[0].ID != node.ID() {
 
 			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/p2p/_testing")
