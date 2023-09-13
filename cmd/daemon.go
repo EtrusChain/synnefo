@@ -139,14 +139,14 @@ to quickly create a Cobra application.`,
 		fmt.Println(check)
 
 		nodeRegister := p2pHost.ListenersP2P
-		go nodeRegister.Register(p2pHost.ListenersLocal.Listeners[protocol.ID("/x/")])
+		defer nodeRegister.Register(p2pHost.ListenersLocal.Listeners[protocol.ID("/x/")])
 
 		fmt.Println(nodeRegister)
 
 		nodePeering.AddPeer(node.Peerstore().PeerInfo(node.ID()))
-		go peering.NewPeeringService(node)
-		go nodePeering.Start()
-		go nodePeering.Stop()
+		defer peering.NewPeeringService(node)
+		defer nodePeering.Start()
+		defer nodePeering.Stop()
 
 		listPeers := nodePeering.ListPeers()
 
