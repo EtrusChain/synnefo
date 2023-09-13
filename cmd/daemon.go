@@ -19,6 +19,8 @@ import (
 	"github.com/EtrusChain/synnefo/repo"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/network"
+	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/multiformats/go-multiaddr"
 	"github.com/spf13/cobra"
 )
 
@@ -191,12 +193,27 @@ to quickly create a Cobra application.`,
 
 		if bootstrapPeerss[0].ID != node.ID() {
 
-			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/libp2p/autonat/1.0.0")
+			remoteAddr, err := multiaddr.NewMultiaddr("/ip4/178.233.168.239/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm")
 			if err != nil {
 				panic(err)
 			}
-			go writeCounter(s)
-			go readCounter(s)
+
+			remotePeer, err := peer.AddrInfoFromP2pAddr(remoteAddr)
+			if err != nil {
+				panic(err)
+			}
+
+			if err := node.Connect(ctx, *remotePeer); err != nil {
+				panic(err)
+			}
+			/*
+				s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/libp2p/autonat/1.0.0")
+				if err != nil {
+					panic(err)
+				}
+				go writeCounter(s)
+				go readCounter(s)
+			*/
 		}
 
 		select {}
