@@ -45,7 +45,7 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 		libp2p.EnableNATService(), // Enable NAT service (optional)
 		libp2p.DefaultTransports,  // Use default transports (optional)
 		libp2p.NATPortMap(),
-		libp2p.Muxer("/synnefo/1.0.0", yamux.DefaultTransport),
+		libp2p.Muxer("/yamux/1.0.0", yamux.DefaultTransport),
 		libp2p.Identity(key),
 		libp2p.Ping(true),
 		/*
