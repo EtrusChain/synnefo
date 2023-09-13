@@ -176,7 +176,7 @@ to quickly create a Cobra application.`,
 			return
 		}
 
-		host.Host.SetStreamHandler(node, "/synnefo/1.0.0", func(s network.Stream) {
+		host.Host.SetStreamHandler(node, "/libp2p/autonat/1.0.0", func(s network.Stream) {
 			err := readCounter(s)
 			if err != nil {
 				s.Reset()
@@ -190,7 +190,7 @@ to quickly create a Cobra application.`,
 
 		if bootstrapPeerss[0].ID != node.ID() {
 
-			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/synnefo/1.0.0")
+			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/libp2p/autonat/1.0.0")
 			if err != nil {
 				panic(err)
 			}
