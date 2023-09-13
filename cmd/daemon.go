@@ -29,6 +29,10 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		const (
+			ServiceName = "_p2p._udp"
+		)
+
 		fmt.Println("daemon called")
 		ctx := context.Background()
 		node, err := node.NewNode(ctx)
@@ -140,13 +144,27 @@ to quickly create a Cobra application.`,
 		fmt.Println(sfdsf)
 
 		nodePeering.AddPeer(node.Peerstore().PeerInfo(node.ID()))
-
+		peering.NewPeeringService(node)
 		nodePeering.Start()
 		nodePeering.Stop()
 
 		listPeers := nodePeering.ListPeers()
 
 		fmt.Println(listPeers)
+
+		/*
+			mDNS := mdns.NewMdnsService(node, ServiceName, mdnsService)
+
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			// Start the mDNS discovery service
+			if err := mDNS.Start(); err != nil {
+				log.Fatal(err)
+			}
+		*/
+
 		select {}
 	},
 }
