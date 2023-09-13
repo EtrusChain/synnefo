@@ -182,9 +182,6 @@ to quickly create a Cobra application.`,
 			go readCounter(s)
 		})
 
-		ada := n.Discovery.Start()
-		fmt.Println(ada)
-
 		n.Discovery.Close()
 
 		if bootstrapPeerss[0].ID != node.ID() {
