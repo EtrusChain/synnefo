@@ -131,13 +131,15 @@ to quickly create a Cobra application.`,
 			errorr := name.Error()
 			fmt.Println(errorr)
 		*/
+		check := p2pHost.CheckProtoExists("/x/")
+		fmt.Println(check)
 
 		sfdsf := p2pHost.ListenersP2P
-		defer sfdsf.Register(p2pHost.ListenersLocal.Listeners[protocol.ID(sd.Bootstrap[0])])
-		fsdfs := p2pHost.ListenersLocal
-		defer fsdfs.Register(p2pHost.ListenersLocal.Listeners[protocol.ID(sd.Bootstrap[0])])
+		defer sfdsf.Register(p2pHost.ListenersLocal.Listeners[protocol.ID("/x/")])
 
 		fmt.Println(sfdsf)
+
+		nodePeering.AddPeer(node.Peerstore().PeerInfo(node.ID()))
 		select {}
 	},
 }
