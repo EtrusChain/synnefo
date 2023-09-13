@@ -43,7 +43,6 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 		//libp2p.DisableRelay(),     // Disable relay (optional)
 		libp2p.ListenAddrStrings("/ip4/0.0.0.0/tcp/4001"),
 		libp2p.EnableNATService(), // Enable NAT service (optional)
-		libp2p.EnableNATService(), // Enable NAT port mapping (optional)
 		libp2p.DefaultTransports,  // Use default transports (optional)
 		libp2p.NATPortMap(),
 		libp2p.Muxer("/synnefo/1.0.0", yamux.DefaultTransport),
