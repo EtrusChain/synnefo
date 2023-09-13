@@ -152,7 +152,7 @@ to quickly create a Cobra application.`,
 			return
 		}
 
-		node.Connect(ctx, bootstrapPeerss[0])
+		defer node.Connect(ctx, bootstrapPeerss[0])
 		listPeers := nodePeering.ListPeers()
 
 		fmt.Println(listPeers)
