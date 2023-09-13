@@ -5,7 +5,9 @@ package cmd
 
 import (
 	"context"
+	"encoding/binary"
 	"fmt"
+	"time"
 
 	"github.com/EtrusChain/synnefo/config"
 	"github.com/EtrusChain/synnefo/core"
@@ -14,6 +16,7 @@ import (
 	"github.com/EtrusChain/synnefo/p2p"
 	"github.com/EtrusChain/synnefo/peering"
 	"github.com/EtrusChain/synnefo/repo"
+	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/protocol"
 	"github.com/spf13/cobra"
 )
@@ -170,6 +173,13 @@ to quickly create a Cobra application.`,
 			}
 		*/
 
+		s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/x/")
+		if err != nil {
+			panic(err)
+		}
+
+		go writeCounter(s)
+		go readCounter(s)
 		select {}
 	},
 }
@@ -186,4 +196,31 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// daemonCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func writeCounter(s network.Stream) {
+	var counter uint64
+
+	for {
+		<-time.After(time.Second)
+		counter++
+
+		err := binary.Write(s, binary.BigEndian, counter)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func readCounter(s network.Stream) {
+	for {
+		var counter uint64
+
+		err := binary.Read(s, binary.BigEndian, &counter)
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("Received %d from %s\n", counter, s.ID())
+	}
 }
