@@ -173,13 +173,16 @@ to quickly create a Cobra application.`,
 			}
 		*/
 
-		s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/p2p/_testing")
-		if err != nil {
-			panic(err)
+		if bootstrapPeerss[0].ID != node.ID() {
+
+			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/p2p/_testing")
+			if err != nil {
+				panic(err)
+			}
+			go writeCounter(s)
+			go readCounter(s)
 		}
 
-		go writeCounter(s)
-		go readCounter(s)
 		select {}
 	},
 }
