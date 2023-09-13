@@ -145,7 +145,7 @@ to quickly create a Cobra application.`,
 		fmt.Println(check)
 
 		nodeRegister := p2pHost.ListenersP2P
-		defer nodeRegister.Register(p2pHost.ListenersLocal.Listeners[protocol.ID("/x/")])
+		defer nodeRegister.Register(p2pHost.ListenersLocal.Listeners[protocol.ID("/synnefo/1.0.0")])
 
 		fmt.Println(nodeRegister)
 
