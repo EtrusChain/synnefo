@@ -14,6 +14,7 @@ import (
 	"github.com/EtrusChain/synnefo/p2p"
 	"github.com/EtrusChain/synnefo/peering"
 	"github.com/EtrusChain/synnefo/repo"
+	"github.com/libp2p/go-libp2p/core/protocol"
 	"github.com/spf13/cobra"
 )
 
@@ -132,6 +133,10 @@ to quickly create a Cobra application.`,
 		*/
 
 		sfdsf := p2pHost.ListenersP2P
+		defer sfdsf.Register(p2pHost.ListenersLocal.Listeners[protocol.ID(sd.Bootstrap[0])])
+		fsdfs := p2pHost.ListenersLocal
+		defer fsdfs.Register(p2pHost.ListenersLocal.Listeners[protocol.ID(sd.Bootstrap[0])])
+
 		fmt.Println(sfdsf)
 		select {}
 	},
