@@ -2,6 +2,7 @@ package p2p
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	p2phost "github.com/libp2p/go-libp2p/core/host"
@@ -42,6 +43,8 @@ func newListenersP2P(host p2phost.Host) *Listeners {
 	}
 
 	host.SetStreamHandlerMatch("/x/", func(p protocol.ID) bool {
+		fmt.Println("Server is listring")
+		fmt.Println(p)
 		reg.RLock()
 		defer reg.RUnlock()
 
