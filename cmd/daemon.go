@@ -7,9 +7,7 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
-	"os"
-	"os/signal"
-	"syscall"
+	"log"
 	"time"
 
 	"github.com/EtrusChain/synnefo/config"
@@ -47,6 +45,7 @@ to quickly create a Cobra application.`,
 			panic(err)
 		}
 
+		log.Println(node.Addrs())
 		p2pHost := p2p.New(node.ID(), node, node.Peerstore())
 
 		nodePeering := peering.NewPeeringService(node)
@@ -191,10 +190,6 @@ to quickly create a Cobra application.`,
 			go writeCounter(s)
 			go readCounter(s)
 		}
-
-		sigCh := make(chan os.Signal)
-		signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGINT)
-		<-sigCh
 
 		select {}
 	},

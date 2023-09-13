@@ -9,7 +9,6 @@ import (
 	"github.com/libp2p/go-libp2p"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	p2phost "github.com/libp2p/go-libp2p/core/host"
-	"github.com/libp2p/go-libp2p/core/peerstore"
 	"github.com/libp2p/go-libp2p/core/routing"
 	"github.com/libp2p/go-libp2p/p2p/muxer/yamux"
 )
@@ -48,7 +47,7 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 		libp2p.EnableNATService(), // Enable NAT port mapping (optional)
 		libp2p.DefaultTransports,  // Use default transports (optional)
 		libp2p.NATPortMap(),
-		libp2p.Muxer("/yamux/1.0.0", yamux.DefaultTransport),
+		libp2p.Muxer("/synnefo/1.0.0", yamux.DefaultTransport),
 		libp2p.Identity(key),
 		libp2p.Ping(true),
 		libp2p.Routing(func(h p2phost.Host) (routing.PeerRouting, error) {
@@ -66,19 +65,20 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 		return nil, err
 	}
 
-	// Attach the DHT to the host
-	dht, err := dht.New(ctx, host)
-	if err != nil {
-		return nil, err
-	}
+	/*
+		// Attach the DHT to the host
+		dht, err := dht.New(ctx, host)
+		if err != nil {
+			return nil, err
+		}
 
-	// Attach the DHT to the host as a routing option
-	host.Peerstore().AddAddrs(host.ID(), host.Addrs(), peerstore.PermanentAddrTTL)
-	err = dht.Bootstrap(ctx)
-	if err != nil {
-		return nil, err
-	}
-
+		// Attach the DHT to the host as a routing option
+		host.Peerstore().AddAddrs(host.ID(), host.Addrs(), peerstore.PermanentAddrTTL)
+		err = dht.Bootstrap(ctx)
+		if err != nil {
+			return nil, err
+		}
+	*/
 	fmt.Println("Peer Address: ", host.ID().String())
 	return host, nil
 }
