@@ -7,9 +7,7 @@ import (
 	"github.com/EtrusChain/synnefo/config"
 	"github.com/EtrusChain/synnefo/repo"
 	"github.com/libp2p/go-libp2p"
-	dht "github.com/libp2p/go-libp2p-kad-dht"
 	p2phost "github.com/libp2p/go-libp2p/core/host"
-	"github.com/libp2p/go-libp2p/core/routing"
 	"github.com/libp2p/go-libp2p/p2p/muxer/yamux"
 )
 
@@ -50,11 +48,13 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 		libp2p.Muxer("/synnefo/1.0.0", yamux.DefaultTransport),
 		libp2p.Identity(key),
 		libp2p.Ping(true),
-		libp2p.Routing(func(h p2phost.Host) (routing.PeerRouting, error) {
-			dht, err := dht.New(ctx, h)
+		/*
+			libp2p.Routing(func(h p2phost.Host) (routing.PeerRouting, error) {
+				dht, err := dht.New(ctx, h)
 
-			return dht, err
-		}),
+				return dht, err
+			}),
+		*/
 		// libp2p.EnableAutoRelayWithPeerSource(),  // Enable auto relay (optional)
 		// libp2p.Security("synnefo", ctx),
 	}
