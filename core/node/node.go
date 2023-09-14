@@ -44,7 +44,7 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 	addr, err := multiaddr.NewMultiaddr("/ip4/0.0.0.0/tcp/5200")
 	// Create a list of libp2p options, including the DHT option
 	opts := []libp2p.Option{
-		libp2p.DisableRelay(), // Disable relay (optional)
+		libp2p.NoListenAddrs,
 		libp2p.ListenAddrStrings(addr.String()),
 		//libp2p.Transport(tcp.NewTCPTransport),
 		libp2p.EnableRelay(),
