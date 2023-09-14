@@ -54,8 +54,8 @@ to quickly create a Cobra application.`,
 
 		a := []string{
 			"/dnsaddr/bootstrap.libp2p.io/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",
-			"/ip4/192.168.0.11/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",         // mars.i.ipfs.io
-			"/ip4/192.168.0.11/udp/4001/quic-v1/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm", // mars.i.ipfs.io
+			"/ip4/178.233.168.239/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",         // mars.i.ipfs.io
+			"/ip4/178.233.168.239/udp/4001/quic-v1/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm", // mars.i.ipfs.io
 		}
 
 		sd := config.Config{
@@ -171,12 +171,8 @@ to quickly create a Cobra application.`,
 		}
 
 		host.Host.SetStreamHandler(node, "/libp2p/autonat/1.0.0", func(s network.Stream) {
-			err := readCounter(s)
-			if err != nil {
-				s.Reset()
-			} else {
-				s.Close()
-			}
+			go writeCounter(s)
+			go readCounter(s)
 		})
 
 		hostInfor := host.InfoFromHost(node)
@@ -188,12 +184,10 @@ to quickly create a Cobra application.`,
 			log.Fatal(err)
 		}
 
-		// Start the mDNS discovery service
-		if err := mDNS.Start(); err != nil {
-			log.Fatal(err)
-		}
-		if bootstrapPeerss[0].ID != node.ID() {
+		defer mDNS.Close()
 
+		if bootstrapPeerss[0].ID != node.ID() {
+			fmt.Println("Non Bootstrap Peer")
 			remoteAddr, err := multiaddr.NewMultiaddr("/ip4/178.233.168.239/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm")
 			if err != nil {
 				panic(err)
@@ -208,14 +202,12 @@ to quickly create a Cobra application.`,
 				panic(err)
 			}
 
-			/*
-				s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/libp2p/autonat/1.0.0")
-				if err != nil {
-					panic(err)
-				}
-				go writeCounter(s)
-				go readCounter(s)
-			*/
+			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/libp2p/autonat/1.0.0")
+			if err != nil {
+				panic(err)
+			}
+			go writeCounter(s)
+			go readCounter(s)
 		}
 
 		select {}
