@@ -188,19 +188,21 @@ to quickly create a Cobra application.`,
 
 		if bootstrapPeerss[0].ID != node.ID() {
 			fmt.Println("Non Bootstrap Peer")
-			remoteAddr, err := multiaddr.NewMultiaddr("/ip4/192.168.0.11/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm")
+			remoteMultiaddr := "/ip4/192.168.0.11/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm"
+
+			peerMA, err := multiaddr.NewMultiaddr(remoteMultiaddr)
+			if err != nil {
+				panic(err)
+			}
+			peerAddrInfo, err := peer.AddrInfoFromP2pAddr(peerMA)
 			if err != nil {
 				panic(err)
 			}
 
-			remotePeer, err := peer.AddrInfoFromP2pAddr(remoteAddr)
-			if err != nil {
+			if err := node.Connect(context.Background(), *peerAddrInfo); err != nil {
 				panic(err)
 			}
-
-			if err := node.Connect(ctx, *remotePeer); err != nil {
-				panic(err)
-			}
+			fmt.Println("Connected to", peerAddrInfo.String())
 
 			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/libp2p/autonat/1.0.0")
 			if err != nil {
