@@ -54,8 +54,8 @@ to quickly create a Cobra application.`,
 
 		a := []string{
 			"/dnsaddr/bootstrap.libp2p.io/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",
-			"/ip4/178.233.168.239/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",         // mars.i.ipfs.io
-			"/ip4/178.233.168.239/udp/4001/quic-v1/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm", // mars.i.ipfs.io
+			"/ip4/192.168.0.11/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",         // mars.i.ipfs.io
+			"/ip4/192.168.0.11/udp/4001/quic-v1/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm", // mars.i.ipfs.io
 		}
 
 		sd := config.Config{
@@ -188,7 +188,7 @@ to quickly create a Cobra application.`,
 
 		if bootstrapPeerss[0].ID != node.ID() {
 			fmt.Println("Non Bootstrap Peer")
-			remoteAddr, err := multiaddr.NewMultiaddr("/ip4/178.233.168.239/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm")
+			remoteAddr, err := multiaddr.NewMultiaddr("/ip4/192.168.0.11/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm")
 			if err != nil {
 				panic(err)
 			}
@@ -206,6 +206,7 @@ to quickly create a Cobra application.`,
 			if err != nil {
 				panic(err)
 			}
+
 			go writeCounter(s)
 			go readCounter(s)
 		}
@@ -239,9 +240,9 @@ func writeCounter(s network.Stream) error {
 		if err != nil {
 			panic(err)
 		}
+		return nil
 	}
 
-	return nil
 }
 
 func readCounter(s network.Stream) error {
@@ -251,13 +252,11 @@ func readCounter(s network.Stream) error {
 		err := binary.Read(s, binary.BigEndian, &counter)
 		if err != nil {
 			panic(err)
-			return err
 		}
 
 		fmt.Printf("Received %d from %s\n", counter, s.ID())
 	}
 
-	return nil
 }
 
 type discoveryNotifee struct {
