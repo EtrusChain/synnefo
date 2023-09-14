@@ -6,9 +6,9 @@ import (
 
 	"github.com/EtrusChain/synnefo/config"
 	"github.com/EtrusChain/synnefo/repo"
-	"github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p"
 	p2phost "github.com/libp2p/go-libp2p/core/host"
+	"github.com/libp2p/go-libp2p/core/peerstore"
 	"github.com/libp2p/go-libp2p/p2p/muxer/yamux"
 )
 
@@ -38,7 +38,6 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.SetLogLevel("synnefo", "DEBUG")
 
 	// Create a list of libp2p options, including the DHT option
 	opts := []libp2p.Option{
@@ -82,6 +81,8 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 			return nil, err
 		}
 	*/
+
+	host.Peerstore().AddAddrs(host.ID(), host.Addrs(), peerstore.PermanentAddrTTL)
 	fmt.Println("Peer Address: ", host.ID().String())
 	return host, nil
 }

@@ -187,6 +187,7 @@ func (ps *PeeringService) Start() error {
 	ps.state = StateRunning
 	fmt.Println("Server Running")
 	for _, handler := range ps.peers {
+		fmt.Println(ps.peers)
 		go handler.startIfDisconnected()
 	}
 	return nil

@@ -21,7 +21,6 @@ import (
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/p2p/discovery/mdns"
-	"github.com/multiformats/go-multiaddr"
 	"github.com/spf13/cobra"
 )
 
@@ -170,6 +169,12 @@ to quickly create a Cobra application.`,
 			return
 		}
 
+		peering := peering.NewPeeringService(node)
+		peering.Start()
+		peering.AddPeer(bootstrapPeers[0])
+		listPeers := peering.ListPeers()
+		fmt.Println(listPeers)
+
 		host.Host.SetStreamHandler(node, "/libp2p/autonat/1.0.0", func(s network.Stream) {
 			go writeCounter(s)
 			go readCounter(s)
@@ -188,21 +193,24 @@ to quickly create a Cobra application.`,
 
 		if bootstrapPeerss[0].ID != node.ID() {
 			fmt.Println("Non Bootstrap Peer")
-			remoteMultiaddr := "/ip4/178.233.168.239/tcp/5200/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm"
 
-			peerMA, err := multiaddr.NewMultiaddr(remoteMultiaddr)
-			if err != nil {
-				panic(err)
-			}
-			peerAddrInfo, err := peer.AddrInfoFromP2pAddr(peerMA)
-			if err != nil {
-				panic(err)
-			}
+			/*
+				remoteMultiaddr := "/ip4/178.233.168.239/tcp/5200/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm"
 
-			if err := node.Connect(context.Background(), *peerAddrInfo); err != nil {
-				panic(err)
-			}
-			fmt.Println("Connected to", peerAddrInfo.String())
+				peerMA, err := multiaddr.NewMultiaddr(remoteMultiaddr)
+				if err != nil {
+					panic(err)
+				}
+				peerAddrInfo, err := peer.AddrInfoFromP2pAddr(peerMA)
+				if err != nil {
+					panic(err)
+				}
+
+				if err := node.Connect(context.Background(), *peerAddrInfo); err != nil {
+					panic(err)
+				}
+				fmt.Println("Connected to", peerAddrInfo.String())
+			*/
 
 			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/libp2p/autonat/1.0.0")
 			if err != nil {
