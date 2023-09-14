@@ -20,6 +20,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/libp2p/go-libp2p/p2p/discovery/mdns"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/spf13/cobra"
 )
@@ -145,16 +146,6 @@ to quickly create a Cobra application.`,
 		*/
 
 		/*
-				mDNS := mdns.NewMdnsService(node, ServiceName, mdnsService)
-
-				if err != nil {
-					log.Fatal(err)
-				}
-
-				// Start the mDNS discovery service
-				if err := mDNS.Start(); err != nil {
-					log.Fatal(err)
-				}
 			check := p2pHost.CheckProtoExists("/x/")
 			fmt.Println(check)
 
@@ -191,6 +182,16 @@ to quickly create a Cobra application.`,
 		hostInfor := host.InfoFromHost(node)
 		fmt.Println(hostInfor)
 
+		mDNS := mdns.NewMdnsService(node, ServiceName, &discoveryNotifee{h: node})
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Start the mDNS discovery service
+		if err := mDNS.Start(); err != nil {
+			log.Fatal(err)
+		}
 		if bootstrapPeerss[0].ID != node.ID() {
 
 			remoteAddr, err := multiaddr.NewMultiaddr("/ip4/178.233.168.239/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm")
@@ -206,6 +207,7 @@ to quickly create a Cobra application.`,
 			if err := node.Connect(ctx, *remotePeer); err != nil {
 				panic(err)
 			}
+
 			/*
 				s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/libp2p/autonat/1.0.0")
 				if err != nil {
@@ -264,4 +266,16 @@ func readCounter(s network.Stream) error {
 	}
 
 	return nil
+}
+
+type discoveryNotifee struct {
+	h host.Host
+}
+
+func (n *discoveryNotifee) HandlePeerFound(pi peer.AddrInfo) {
+	fmt.Printf("discovered new peer %s\n", pi.ID.Pretty())
+	err := n.h.Connect(context.Background(), pi)
+	if err != nil {
+		fmt.Printf("error connecting to peer %s: %s\n", pi.ID.Pretty(), err)
+	}
 }
