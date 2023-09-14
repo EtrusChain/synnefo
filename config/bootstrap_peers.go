@@ -16,8 +16,8 @@ import (
 // import dependency issue. TODO: move this into a config/default/ package.
 var DefaultBootstrapAddresses = []string{
 	"/dnsaddr/bootstrap.libp2p.io/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",
-	"/ip4/178.233.168.239/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",
-	"/ip4/178.233.168.239/udp/4001/quic-v1/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",
+	"/ip4/178.233.168.239/tcp/5200/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",
+	"/ip4/178.233.168.239/udp/5200/quic-v1/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",
 }
 
 // ErrInvalidPeerAddr signals an address is not a valid peer address.
