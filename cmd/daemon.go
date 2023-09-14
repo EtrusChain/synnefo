@@ -239,7 +239,7 @@ func init() {
 	// daemonCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func writeCounter(s network.Stream) error {
+func writeCounter(s network.Stream) {
 	var counter uint64
 
 	for {
@@ -250,12 +250,11 @@ func writeCounter(s network.Stream) error {
 		if err != nil {
 			panic(err)
 		}
-		return nil
 	}
 
 }
 
-func readCounter(s network.Stream) error {
+func readCounter(s network.Stream) {
 	for {
 		var counter uint64
 
