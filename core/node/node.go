@@ -9,8 +9,6 @@ import (
 	"github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p"
 	p2phost "github.com/libp2p/go-libp2p/core/host"
-	"github.com/libp2p/go-libp2p/p2p/muxer/yamux"
-	"github.com/multiformats/go-multiaddr"
 )
 
 func NewNode(ctx context.Context) (p2phost.Host, error) {
@@ -41,20 +39,13 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 	}
 	log.SetLogLevel("synnefo", "DEBUG")
 
-	addr, err := multiaddr.NewMultiaddr("/ip4/0.0.0.0/tcp/5200")
 	// Create a list of libp2p options, including the DHT option
 	opts := []libp2p.Option{
-		libp2p.NoListenAddrs,
-		libp2p.ListenAddrStrings(addr.String()),
+		libp2p.ListenAddrStrings("/ip4/0.0.0.0/tcp/5200"),
 		//libp2p.Transport(tcp.NewTCPTransport),
-		libp2p.EnableRelay(),
 		libp2p.EnableNATService(), // Enable NAT service (optional)
-		libp2p.DefaultTransports,  // Use default transports (optional)
 		libp2p.NATPortMap(),
-		libp2p.Muxer("/yamux/1.0.0", yamux.DefaultTransport),
 		libp2p.Identity(key),
-		libp2p.Ping(true),
-		//libp2p.Security("/libp2p/autonat/1.0.0", ctx),
 		/*
 			libp2p.Routing(func(h p2phost.Host) (routing.PeerRouting, error) {
 				dht, err := dht.New(ctx, h)
