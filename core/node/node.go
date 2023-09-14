@@ -10,7 +10,6 @@ import (
 	"github.com/libp2p/go-libp2p"
 	p2phost "github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/p2p/muxer/yamux"
-	"github.com/libp2p/go-libp2p/p2p/transport/tcp"
 )
 
 func NewNode(ctx context.Context) (p2phost.Host, error) {
@@ -44,7 +43,7 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 	opts := []libp2p.Option{
 		//libp2p.DisableRelay(),     // Disable relay (optional)
 		libp2p.ListenAddrStrings("/ip4/0.0.0.0/tcp/4001"),
-		libp2p.Transport(tcp.NewTCPTransport),
+		//libp2p.Transport(tcp.NewTCPTransport),
 		libp2p.EnableRelay(),
 		libp2p.EnableNATService(), // Enable NAT service (optional)
 		libp2p.DefaultTransports,  // Use default transports (optional)
