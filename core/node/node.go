@@ -51,6 +51,7 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 		libp2p.Muxer("/yamux/1.0.0", yamux.DefaultTransport),
 		libp2p.Identity(key),
 		libp2p.Ping(true),
+		libp2p.Security("synnefo", ctx),
 		/*
 			libp2p.Routing(func(h p2phost.Host) (routing.PeerRouting, error) {
 				dht, err := dht.New(ctx, h)
@@ -59,7 +60,6 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 			}),
 		*/
 		// libp2p.EnableAutoRelayWithPeerSource(),  // Enable auto relay (optional)
-		// libp2p.Security("synnefo", ctx),
 	}
 
 	// Create the libp2p host with the DHT option
