@@ -54,8 +54,8 @@ to quickly create a Cobra application.`,
 
 		a := []string{
 			"/dnsaddr/bootstrap.libp2p.io/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",
-			"/ip4/192.168.0.11/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",         // mars.i.ipfs.io
-			"/ip4/192.168.0.11/udp/4001/quic-v1/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm", // mars.i.ipfs.io
+			"/ip4/178.233.168.239/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",
+			"/ip4/178.233.168.239/udp/4001/quic-v1/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm",
 		}
 
 		sd := config.Config{
@@ -188,7 +188,7 @@ to quickly create a Cobra application.`,
 
 		if bootstrapPeerss[0].ID != node.ID() {
 			fmt.Println("Non Bootstrap Peer")
-			remoteMultiaddr := "/ip4/192.168.0.11/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm"
+			remoteMultiaddr := "/ip4/178.233.168.239/tcp/4001/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm"
 
 			peerMA, err := multiaddr.NewMultiaddr(remoteMultiaddr)
 			if err != nil {
