@@ -179,6 +179,8 @@ to quickly create a Cobra application.`,
 		host.Host.SetStreamHandler(node, "/libp2p/autonat/1.0.0", func(s network.Stream) {
 			go writeCounter(s)
 			go readCounter(s)
+
+			s.Close()
 		})
 
 		hostInfor := host.InfoFromHost(node)
