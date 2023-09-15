@@ -10,8 +10,6 @@ import (
 	"github.com/libp2p/go-libp2p"
 	p2phost "github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peerstore"
-	"github.com/libp2p/go-libp2p/p2p/muxer/yamux"
-	"github.com/libp2p/go-libp2p/p2p/transport/tcp"
 )
 
 func NewNode(ctx context.Context) (p2phost.Host, error) {
@@ -41,12 +39,6 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 		return nil, err
 	}
 
-	// Create a transport that supports both TCP and WebSocket
-	transports := libp2p.ChainOptions(
-		libp2p.Transport(tcp.NewTCPTransport),
-		//libp2p.Transport(websocket.New(websocket.Tra)),
-	)
-
 	// Create a list of libp2p options, including the DHT option
 	opts := []libp2p.Option{
 		libp2p.ListenAddrStrings("/ip4/0.0.0.0/tcp/5200"),
@@ -55,11 +47,10 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 		libp2p.AutoNATServiceRateLimit(1, 3, time.Hour),
 		libp2p.DefaultTransports, // Use default transports (optional)
 		libp2p.NATPortMap(),
-		libp2p.Muxer("/yamux/1.0.0", yamux.DefaultTransport),
+		//libp2p.Muxer("/yamux/1.0.0", yamux.DefaultTransport),
 		libp2p.Identity(key),
 		libp2p.Ping(true),
-		libp2p.Transport(transports),
-		libp2p.Security("/libp2p/autonat/1.0.0", ctx),
+		//libp2p.Security("/p2p/_testing", context.Background()),
 		/*
 			libp2p.Routing(func(h p2phost.Host) (routing.PeerRouting, error) {
 				dht, err := dht.New(ctx, h)
