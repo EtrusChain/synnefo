@@ -43,6 +43,8 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 	opts := []libp2p.Option{
 		libp2p.ListenAddrStrings("/ip4/0.0.0.0/tcp/5200"),
 		libp2p.EnableRelay(),
+		libp2p.EnableRelayService(),
+		libp2p.DefaultEnableRelay,
 		libp2p.EnableNATService(), // Enable NAT service (optional)
 		libp2p.AutoNATServiceRateLimit(1, 3, time.Hour),
 		libp2p.DefaultTransports, // Use default transports (optional)
