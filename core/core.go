@@ -143,7 +143,7 @@ func (n *SynnefoNode) saveTempBootstrapPeers(ctx context.Context, peerList []pee
 		panic(err)
 	}
 
-	db.Close()
+	defer db.Close()
 
 	bytes, err := json.Marshal(config.BootstrapPeerStrings(peerList))
 	if err != nil {
@@ -162,7 +162,7 @@ func (n *SynnefoNode) loadTempBootstrapPeers(ctx context.Context) ([]peer.AddrIn
 		panic(err)
 	}
 
-	db.Close()
+	defer db.Close()
 
 	bytes, err := db.GetValue("TempBootstrapPeersKey")
 	if err != nil {

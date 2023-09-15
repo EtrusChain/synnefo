@@ -195,7 +195,7 @@ to quickly create a Cobra application.`,
 		if bootstrapPeerss[0].ID != node.ID() {
 			fmt.Println("Non Bootstrap Peer")
 
-			peerMA, err := multiaddr.NewMultiaddr(config.BootstrapPeerStrings(bootstrapPeerss)[0])
+			peerMA, err := multiaddr.NewMultiaddr("/ip4/178.233.168.239/tcp/5200/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm")
 			if err != nil {
 				panic(err)
 			}
@@ -213,6 +213,8 @@ to quickly create a Cobra application.`,
 			if err != nil {
 				panic(err)
 			}
+
+			defer s.Close()
 
 			go writeCounter(s)
 			go readCounter(s)
