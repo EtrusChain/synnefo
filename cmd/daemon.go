@@ -176,7 +176,7 @@ to quickly create a Cobra application.`,
 		listPeers := peering.ListPeers()
 		fmt.Println(listPeers)
 
-		host.Host.SetStreamHandler(node, "/libp2p/autonat/1.0.0", func(s network.Stream) {
+		host.Host.SetStreamHandler(node, "/libp2p/circuit/relay/0.2.0/hop", func(s network.Stream) {
 			go writeCounter(s)
 			go readCounter(s)
 
@@ -211,7 +211,7 @@ to quickly create a Cobra application.`,
 			}
 
 			fmt.Println("Connected to", peerAddrInfo.String())
-			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/libp2p/autonat/1.0.0")
+			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/libp2p/circuit/relay/0.2.0/hop")
 			if err != nil {
 				panic(err)
 			}
