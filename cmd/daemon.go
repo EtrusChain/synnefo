@@ -195,7 +195,7 @@ to quickly create a Cobra application.`,
 		if bootstrapPeerss[0].ID != node.ID() {
 			fmt.Println("Non Bootstrap Peer")
 
-			peerMA, err := multiaddr.NewMultiaddr(config.BootstrapPeerStrings(bootstrapPeerss)[1])
+			peerMA, err := multiaddr.NewMultiaddr(config.BootstrapPeerStrings(bootstrapPeerss)[0])
 			if err != nil {
 				panic(err)
 			}
@@ -209,7 +209,7 @@ to quickly create a Cobra application.`,
 			}
 
 			fmt.Println("Connected to", peerAddrInfo.String())
-			s, err := node.NewStream(context.Background(), bootstrapPeerss[1].ID, "/libp2p/autonat/1.0.0")
+			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/libp2p/autonat/1.0.0")
 			if err != nil {
 				panic(err)
 			}
