@@ -211,6 +211,8 @@ to quickly create a Cobra application.`,
 				}
 				fmt.Println("Connected to", peerAddrInfo.String())
 			*/
+			bus := node.EventBus()
+			fmt.Println(bus)
 
 			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/libp2p/autonat/1.0.0")
 			if err != nil {
