@@ -176,7 +176,7 @@ to quickly create a Cobra application.`,
 		listPeers := peering.ListPeers()
 		fmt.Println(listPeers)
 
-		host.Host.SetStreamHandler(node, "/libp2p/circuit/relay/0.2.0/hop", func(s network.Stream) {
+		host.Host.SetStreamHandler(node, "/synnefo/1.0.0", func(s network.Stream) {
 			go writeCounter(s)
 			go readCounter(s)
 
@@ -197,7 +197,7 @@ to quickly create a Cobra application.`,
 		if bootstrapPeerss[0].ID != node.ID() {
 			fmt.Println("Non Bootstrap Peer")
 
-			peerMA, err := multiaddr.NewMultiaddr("/ip4/178.233.168.239/tcp/5200/p2p/" + node.ID().String() + "/p2p-circuit/p2p/" + "QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm")
+			peerMA, err := multiaddr.NewMultiaddr("/ip4/192.168.0.11/tcp/5200/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm")
 			if err != nil {
 				panic(err)
 			}
@@ -211,7 +211,7 @@ to quickly create a Cobra application.`,
 			}
 
 			fmt.Println("Connected to", peerAddrInfo.String())
-			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/libp2p/circuit/relay/0.2.0/hop")
+			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/synnefo/1.0.0")
 			if err != nil {
 				panic(err)
 			}
