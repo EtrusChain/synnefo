@@ -216,10 +216,11 @@ to quickly create a Cobra application.`,
 				panic(err)
 			}
 
-			defer s.Close()
-
 			go writeCounter(s)
 			go readCounter(s)
+
+			defer s.Close()
+
 		}
 
 		select {}
