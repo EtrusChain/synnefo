@@ -4,6 +4,7 @@ Copyright © 2023 NAME HERE yusufmirza55@hotmail.com
 package cmd
 
 import (
+	"bufio"
 	"context"
 	"encoding/binary"
 	"fmt"
@@ -20,11 +21,11 @@ import (
 	"github.com/EtrusChain/synnefo/p2p"
 	"github.com/EtrusChain/synnefo/peering"
 	"github.com/EtrusChain/synnefo/repo"
+	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/p2p/discovery/mdns"
-	"github.com/multiformats/go-multiaddr"
 	"github.com/spf13/cobra"
 )
 
@@ -179,10 +180,10 @@ to quickly create a Cobra application.`,
 		listPeers := peering.ListPeers()
 		fmt.Println(listPeers)
 
-		host.Host.SetStreamHandler(node, "/synnefo/1.0.0", func(s network.Stream) {
-			go writeCounter(s)
-			go readCounter(s)
-		})
+		gossipSub, err := pubsub.NewGossipSub(ctx, node)
+		if err != nil {
+			panic(err)
+		}
 
 		hostInfor := host.InfoFromHost(node)
 		fmt.Println(hostInfor)
@@ -193,33 +194,50 @@ to quickly create a Cobra application.`,
 			log.Fatal(err)
 		}
 
-		defer mDNS.Close()
+		mDNS.Start()
+
+		room := "/synnefo/daemon/" + node.ID().String()
+		topic, err := gossipSub.Join(room)
+		if err != nil {
+			panic(err)
+		}
+
+		publish(ctx, topic)
 
 		if bootstrapPeerss[0].ID != node.ID() {
 			fmt.Println("Non Bootstrap Peer")
 
-			peerMA, err := multiaddr.NewMultiaddr("/ip4/192.168.0.11/tcp/5200/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm")
-			if err != nil {
-				panic(err)
-			}
-			peerAddrInfo, err := peer.AddrInfoFromP2pAddr(peerMA)
-			if err != nil {
-				panic(err)
-			}
-
-			if err := node.Connect(context.Background(), *peerAddrInfo); err != nil {
-				panic(err)
-			}
-
-			fmt.Println("Connected to", peerAddrInfo.String())
-			s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/synnefo/1.0.0")
+			// subscribe to topic
+			subscriber, err := topic.Subscribe()
 			if err != nil {
 				panic(err)
 			}
 
-			go writeCounter(s)
-			go readCounter(s)
+			subscribe(subscriber, ctx, node.ID())
 
+			/*
+				peerMA, err := multiaddr.NewMultiaddr("/ip4/192.168.0.11/tcp/5200/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm")
+				if err != nil {
+					panic(err)
+				}
+				peerAddrInfo, err := peer.AddrInfoFromP2pAddr(peerMA)
+				if err != nil {
+					panic(err)
+				}
+
+				if err := node.Connect(context.Background(), *peerAddrInfo); err != nil {
+					panic(err)
+				}
+
+				fmt.Println("Connected to", peerAddrInfo.String())
+				s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/synnefo/1.0.0")
+				if err != nil {
+					panic(err)
+				}
+
+				go writeCounter(s)
+				go readCounter(s)
+			*/
 		}
 
 		sigCh := make(chan os.Signal)
@@ -242,6 +260,38 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// daemonCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func publish(ctx context.Context, topic *pubsub.Topic) {
+	for {
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			fmt.Printf("enter message to publish: \n")
+
+			msg := scanner.Text()
+			if len(msg) != 0 {
+				// publish message to topic
+				bytes := []byte(msg)
+				topic.Publish(ctx, bytes)
+			}
+		}
+	}
+}
+
+func subscribe(subscriber *pubsub.Subscription, ctx context.Context, hostID peer.ID) {
+	for {
+		msg, err := subscriber.Next(ctx)
+		if err != nil {
+			panic(err)
+		}
+
+		// only consider messages delivered by other peers
+		if msg.ReceivedFrom == hostID {
+			continue
+		}
+
+		fmt.Printf("got message: %s, from: %s\n", string(msg.Data), msg.ReceivedFrom.Pretty())
+	}
 }
 
 func writeCounter(s network.Stream) {
