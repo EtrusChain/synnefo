@@ -6,13 +6,11 @@ package cmd
 import (
 	"bufio"
 	"context"
-	"encoding/binary"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/EtrusChain/synnefo/config"
 	"github.com/EtrusChain/synnefo/core"
@@ -23,7 +21,6 @@ import (
 	"github.com/EtrusChain/synnefo/repo"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/libp2p/go-libp2p/core/host"
-	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/p2p/discovery/mdns"
 	"github.com/spf13/cobra"
@@ -44,7 +41,6 @@ to quickly create a Cobra application.`,
 			ServiceName = "_p2p._udp"
 		)
 
-		fmt.Println("daemon called")
 		ctx := context.Background()
 		node, err := node.NewNode(ctx)
 		if err != nil {
@@ -121,8 +117,6 @@ to quickly create a Cobra application.`,
 			IsDaemon: true,
 		}
 
-		fmt.Println(n)
-
 		bootstrapPeers, err := config.DefaultBootstrapPeers()
 		if err != nil {
 			panic(err)
@@ -135,39 +129,7 @@ to quickly create a Cobra application.`,
 			panic(err)
 		}
 
-		fmt.Println(bootstrapPeers)
-		fmt.Println(bootsrapConfig)
 		peering.NewPeeringService(node)
-
-		/*
-			listeners := &p2p.Listeners{
-				Listeners: map[protocol.ID]p2p.Listener{},
-			}
-
-			name := listeners.Register(listeners.Listeners["/x/"])
-			errorr := name.Error()
-			fmt.Println(errorr)
-		*/
-
-		/*
-			check := p2pHost.CheckProtoExists("/x/")
-			fmt.Println(check)
-
-			nodeRegister := p2pHost.ListenersP2P
-			defer nodeRegister.Register(p2pHost.ListenersLocal.Listeners[protocol.ID("/synnefo/1.0.0")])
-
-			fmt.Println(nodeRegister)
-
-			nodePeering.AddPeer(node.Peerstore().PeerInfo(node.ID()))
-			defer peering.NewPeeringService(node)
-			defer nodePeering.Start()
-			defer nodePeering.Stop()
-
-			defer node.Connect(ctx, bootstrapPeerss[0])
-			listPeers := nodePeering.ListPeers()
-
-			fmt.Println(listPeers)
-		*/
 
 		bootstrapPeerss, err := sd.BootstrapPeers()
 		if err != nil {
@@ -180,6 +142,7 @@ to quickly create a Cobra application.`,
 		listPeers := peering.ListPeers()
 		fmt.Println(listPeers)
 
+		// PUB/SUB
 		gossipSub, err := pubsub.NewGossipSub(ctx, node)
 		if err != nil {
 			panic(err)
@@ -205,8 +168,6 @@ to quickly create a Cobra application.`,
 		publish(ctx, topic)
 
 		if bootstrapPeerss[0].ID != node.ID() {
-			fmt.Println("Non Bootstrap Peer")
-
 			bootstrapRoom := "/synnefo/daemon/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm"
 
 			bootstapTopic, err := gossipSub.Join(bootstrapRoom)
@@ -298,35 +259,6 @@ func subscribe(subscriber *pubsub.Subscription, ctx context.Context, hostID peer
 
 		fmt.Printf("got message: %s, from: %s\n", string(msg.Data), msg.ReceivedFrom.Pretty())
 	}
-}
-
-func writeCounter(s network.Stream) {
-	var counter uint64
-
-	for {
-		<-time.After(time.Second)
-		counter++
-
-		err := binary.Write(s, binary.BigEndian, counter)
-		if err != nil {
-			panic(err)
-		}
-	}
-
-}
-
-func readCounter(s network.Stream) {
-	for {
-		var counter uint64
-
-		err := binary.Read(s, binary.BigEndian, &counter)
-		if err != nil {
-			panic(err)
-		}
-
-		fmt.Printf("Received %d from %s\n", counter, s.ID())
-	}
-
 }
 
 type discoveryNotifee struct {
