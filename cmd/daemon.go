@@ -8,6 +8,9 @@ import (
 	"encoding/binary"
 	"fmt"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/EtrusChain/synnefo/config"
@@ -219,7 +222,11 @@ to quickly create a Cobra application.`,
 
 		}
 
-		select {}
+		sigCh := make(chan os.Signal)
+		signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGINT)
+		<-sigCh
+
+		//select {}
 	},
 }
 
