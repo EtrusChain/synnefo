@@ -207,8 +207,14 @@ to quickly create a Cobra application.`,
 		if bootstrapPeerss[0].ID != node.ID() {
 			fmt.Println("Non Bootstrap Peer")
 
+			bootstrapRoom := "/synnefo/daemon/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm"
+
+			bootstapTopic, err := gossipSub.Join(bootstrapRoom)
+			if err != nil {
+				panic(err)
+			}
 			// subscribe to topic
-			subscriber, err := topic.Subscribe()
+			subscriber, err := bootstapTopic.Subscribe()
 			if err != nil {
 				panic(err)
 			}
