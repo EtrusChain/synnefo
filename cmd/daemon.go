@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/EtrusChain/synnefo/config"
 	"github.com/EtrusChain/synnefo/core"
@@ -206,10 +204,6 @@ to quickly create a Cobra application.`,
 				go readCounter(s)
 			*/
 		}
-
-		sigCh := make(chan os.Signal)
-		signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGINT)
-		<-sigCh
 
 		//select {}
 	},
