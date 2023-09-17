@@ -68,7 +68,7 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	defer host.Close()
 	/*
 		// Attach the DHT to the host
 		dht, err := dht.New(ctx, host)
