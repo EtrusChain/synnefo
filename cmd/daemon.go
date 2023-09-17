@@ -177,7 +177,6 @@ to quickly create a Cobra application.`,
 		fmt.Println(listPeers)
 
 		host.Host.SetStreamHandler(node, "/synnefo/1.0.0", func(s network.Stream) {
-			go writeCounter(s)
 			go readCounter(s)
 
 			s.Close()
@@ -216,7 +215,6 @@ to quickly create a Cobra application.`,
 				panic(err)
 			}
 
-			go writeCounter(s)
 			go readCounter(s)
 
 			defer s.Close()
