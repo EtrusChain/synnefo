@@ -158,6 +158,7 @@ to quickly create a Cobra application.`,
 		mDNS.Start()
 
 		room := "/synnefo/daemon/" + node.ID().String()
+		fmt.Println(room)
 		topic, err := gossipSub.Join(room)
 		if err != nil {
 			panic(err)
