@@ -3,13 +3,13 @@ package node
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/EtrusChain/synnefo/config"
 	"github.com/EtrusChain/synnefo/repo"
 	"github.com/libp2p/go-libp2p"
 	p2phost "github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peerstore"
+	"github.com/libp2p/go-libp2p/p2p/muxer/yamux"
 )
 
 func NewNode(ctx context.Context) (p2phost.Host, error) {
@@ -44,12 +44,9 @@ func NewNode(ctx context.Context) (p2phost.Host, error) {
 		libp2p.ListenAddrStrings("/ip4/0.0.0.0/tcp/5200"),
 		libp2p.EnableRelay(),
 		libp2p.EnableRelayService(),
-		libp2p.DefaultEnableRelay,
 		libp2p.EnableNATService(), // Enable NAT service (optional)
-		libp2p.AutoNATServiceRateLimit(1, 3, time.Hour),
-		libp2p.DefaultTransports, // Use default transports (optional)
 		libp2p.NATPortMap(),
-		//libp2p.Muxer("/yamux/1.0.0", yamux.DefaultTransport),
+		libp2p.Muxer("/yamux/1.0.0", yamux.DefaultTransport),
 		libp2p.Identity(key),
 		libp2p.Ping(true),
 		//libp2p.Security("/p2p/_testing", context.Background()),
