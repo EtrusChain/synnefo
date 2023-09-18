@@ -20,7 +20,6 @@ import (
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
-	"github.com/libp2p/go-libp2p/p2p/discovery/mdns"
 	"github.com/spf13/cobra"
 )
 
@@ -127,86 +126,33 @@ to quickly create a Cobra application.`,
 			panic(err)
 		}
 
-		peering.NewPeeringService(node)
-
-		bootstrapPeerss, err := sd.BootstrapPeers()
-		if err != nil {
-			return
-		}
-
-		peering := peering.NewPeeringService(node)
-		peering.Start()
-		peering.AddPeer(bootstrapPeers[0])
-		listPeers := peering.ListPeers()
-		fmt.Println(listPeers)
-
-		// PUB/SUB
-		gossipSub, err := pubsub.NewGossipSub(ctx, node)
+		remote, err := n.P2P.ForwardRemote(ctx, "/synnefo/1.0.0", node.Addrs()[0], true)
 		if err != nil {
 			panic(err)
 		}
 
-		hostInfor := host.InfoFromHost(node)
-		fmt.Println(hostInfor)
-
-		mDNS := mdns.NewMdnsService(node, ServiceName, &discoveryNotifee{h: node})
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		mDNS.Start()
-
-		room := "/synnefo/daemon/" + node.ID().String()
-		fmt.Println(room)
-		topic, err := gossipSub.Join(room)
+		bootsrap, err := sd.BootstrapPeers()
 		if err != nil {
 			panic(err)
 		}
 
-		publish(ctx, topic)
+		if bootsrap[0].ID != node.ID() {
 
-		if bootstrapPeerss[0].ID != node.ID() {
-			bootstrapRoom := "/synnefo/daemon/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm"
-
-			bootstapTopic, err := gossipSub.Join(bootstrapRoom)
+			n.PeerHost.Network().Notify(p2pHost.Streams.Notifee())
+			networkNode, err := node.Network().DialPeer(ctx, node.ID())
 			if err != nil {
 				panic(err)
 			}
-			// subscribe to topic
-			subscriber, err := bootstapTopic.Subscribe()
-			if err != nil {
-				panic(err)
-			}
+			n.P2P.Streams.Notifee().Connected(n.PeerHost.Network(), networkNode)
 
-			subscribe(subscriber, ctx, node.ID())
+			he := remote.ListenAddress()
+			hu := remote.TargetAddress()
+			fmt.Println(he, hu)
 
-			/*
-				peerMA, err := multiaddr.NewMultiaddr("/ip4/192.168.0.11/tcp/5200/p2p/QmX7jAWE95GidPbrdwFof326TGbbg7nuDFFgzHJh7EmzKm")
-				if err != nil {
-					panic(err)
-				}
-				peerAddrInfo, err := peer.AddrInfoFromP2pAddr(peerMA)
-				if err != nil {
-					panic(err)
-				}
-
-				if err := node.Connect(context.Background(), *peerAddrInfo); err != nil {
-					panic(err)
-				}
-
-				fmt.Println("Connected to", peerAddrInfo.String())
-				s, err := node.NewStream(context.Background(), bootstrapPeerss[0].ID, "/synnefo/1.0.0")
-				if err != nil {
-					panic(err)
-				}
-
-				go writeCounter(s)
-				go readCounter(s)
-			*/
+			peering.NewPeeringService(node)
 		}
 
-		//select {}
+		select {}
 	},
 }
 
