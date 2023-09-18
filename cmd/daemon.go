@@ -139,7 +139,7 @@ to quickly create a Cobra application.`,
 		if bootsrap[0].ID != node.ID() {
 
 			n.PeerHost.Network().Notify(p2pHost.Streams.Notifee())
-			networkNode, err := node.Network().DialPeer(ctx, node.ID())
+			networkNode, err := node.Network().DialPeer(ctx, bootsrap[0].ID)
 			if err != nil {
 				panic(err)
 			}
